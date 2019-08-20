@@ -14,3 +14,16 @@ question level classification pre-trained model download link : <br>
 
 Answer Selection
 ------------------
+1. ``Answer_Selection/setup.sh``을 실행시켜주세요.
+>./setup.sh
+
+2. 다음 링크의 미리 학습된 모델과 데이터를 받아서 압축해제 후 ``Answer_Selection/model`` 과 ``Answer_Selection/data`` 디렉토리를 덮어씌워 주세요.
+Answer selection classification pre-trained model and data download link: 
+>[Google drive link](https://drive.google.com/file/d/1Ik0voBoBlVNmXoMmcYaPreIYY4FRAh41/view?usp=sharing)
+
+3. ``Answer_Selection/run_predict.sh``를 실행하면 output이 출력됩니다.(예시포함)
+>./run_predict.sh
+
+4. ``output``으로 다음 두가지가 출력됩니다.
+>Answer Confidence : [x.xxxx  x.xxxx]
+>Selected Answer : blah blah ~.
