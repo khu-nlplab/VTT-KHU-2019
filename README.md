@@ -3,7 +3,7 @@
 Question Level classification 
 -----------------------------
 입력 질문에 대한 난이도를 측정하는 모델입니다.
-``[Heo et al.(AAAI Spring Symposium)](https://arxiv.org/abs/1904.00623)``에 정의되어 있는 Criteria 중 2가지(Memory, Logical Complexity)의 관점에서 난이도를 측정합니다.
+[Heo et al.(AAAI Spring Symposium)](https://arxiv.org/abs/1904.00623)에 정의되어 있는 Criteria 중 2가지(Memory, Logical Complexity)의 관점에서 난이도를 측정합니다.
 
 1. ``Level_Classification/requirement.sh``을 실행시켜주세요
 > ./requirement.sh
@@ -22,6 +22,8 @@ question level classification pre-trained model download link : <br>
 
 Answer Selection
 ------------------
+다중의 응답을 입력으로 받아 가장 적절한 응답을 선택하는 모델입니다.
+
 1. ``Answer_Selection/setup.sh``을 실행시켜주세요.
 >./setup.sh
 
