@@ -20,7 +20,7 @@ question level classification pre-trained model download link : <br>
 > Memory Level : 1 <br>
 > Logic Level : 2
 
-Contact : Su-Hwan Yun (shyun3432@khu.ac.kr)
+Contact : Su-Hwan Yun (yunsh3432@khu.ac.kr)
 
 Multiple Answer Selection (MAS)
 ------------------
