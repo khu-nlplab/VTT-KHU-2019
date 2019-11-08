@@ -20,6 +20,8 @@ question level classification pre-trained model download link : <br>
 > Memory Level : 1 <br>
 > Logic Level : 2
 
+Contact : Su-Hwan Yun (shyun3432@khu.ac.kr)
+
 Multiple Answer Selection (MAS)
 ------------------
 다중의 응답을 입력으로 받아 가장 적절한 응답을 선택하는 모델입니다. <br><br>
@@ -37,3 +39,5 @@ Answer selection classification pre-trained model and data download link: <br>
 4. ``output``으로 다음 두가지가 출력됩니다.
 >Answer Confidence : [x.xxxx  x.xxxx] <br>
 >Selected Answer : blah blah ~.
+
+Contact : Gyu-Min Park (pgm1219@khu.ac.kr)
