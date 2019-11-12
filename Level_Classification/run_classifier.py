@@ -39,7 +39,7 @@ from apex.fp16_utils import FP16_Optimizer
 
 
 import tokenization
-from pickle_model import SequenceClassification
+from modeling import SequenceClassification
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -473,7 +473,7 @@ def main():
     model = SequenceClassification(vocab_dim, args.embedding_dim, args.dropout_prob, len(label_list), device)
 
     if args.load_model is not None:
-        model.load_state_dict(torch.load(args.load_model),map_location='cpu')
+        model.load_state_dict(torch.load(args.load_model,map_location='cpu'))
 
     model.to(device)
 

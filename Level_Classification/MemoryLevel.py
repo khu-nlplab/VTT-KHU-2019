@@ -20,7 +20,7 @@ from matplotlib import pyplot as plt
 from apex import amp
 from apex.parallel import DistributedDataParallel as DDP
 from apex.fp16_utils import FP16_Optimizer
-from pickle_model import SequenceClassification
+from modeling import SequenceClassification
 
 import tokenization
 
