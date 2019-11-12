@@ -193,9 +193,9 @@ class SequenceClassification(nn.Module):
         sd_transform = self.sd_transformer(sd_emb)
 
         #Residual Net
-        q_res = torch.add(q_transform,q_emb)
-        d_res = torch.add(d_transform,d_emb)
-        sd_res = torch.add(sd_transform,sd_emb)
+        q_res = torch.cat((q_transform,q_emb),2)
+        d_res = torch.cat((d_transform,d_emb),2)
+        sd_res = torch.cat((sd_transform,sd_emb),2)
 
         #alignment
         q_d_similarity = self.similarity(d_res, q_res)
