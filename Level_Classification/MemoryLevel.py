@@ -148,7 +148,7 @@ def convert_to_ids(examples, label_list, max_seq_length, tokenizer):
     return features
 
 
-def Logic_level_model(qestion, clip_description, scene_description):
+def Memory_level_model(qestion, clip_description, scene_description):
     # environment
     device = "cuda" if torch.cuda.is_available() else "cpu"
     max_sequence_length = 128
@@ -167,7 +167,7 @@ def Logic_level_model(qestion, clip_description, scene_description):
 
     model = SequenceClassification(vocab_dim, embedding_dim, dropout_prob, len(label_list), device)
 
-    init_checkpoint = 'model/logic_model_500.bin'
+    init_checkpoint = 'model/Memory_model.bin'
 
     # Future save model Load code
 
