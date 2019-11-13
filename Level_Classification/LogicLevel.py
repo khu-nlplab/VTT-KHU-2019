@@ -164,7 +164,7 @@ def Logic_level_model(qestion, clip_description, scene_description):
 
     model = SequenceClassification(vocab_dim, embedding_dim, dropout_prob, len(label_list), device)
 
-    init_checkpoint = 'model/logic_model_500.bin'
+    init_checkpoint = 'model/Logic_model.bin'
 
     #Future save model Load code
 
