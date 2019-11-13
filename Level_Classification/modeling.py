@@ -56,16 +56,16 @@ class SequenceClassification(nn.Module):
         self.result_Linear = nn.Linear(embedding_dim*24, embedding_dim*24)
 
         self.classifier = nn.Sequential(
-            nn.Linear(embedding_dim*48, embedding_dim*24),
+            nn.Linear(embedding_dim*48, embedding_dim*32),
             nn.ReLU(),
             nn.Dropout(p=dropout_prob),
-            nn.Linear(embedding_dim*24, embedding_dim*12),
+            nn.Linear(embedding_dim*32, embedding_dim*8),
             nn.ReLU(),
             nn.Dropout(p=dropout_prob),
-            nn.Linear(embedding_dim*12, embedding_dim),
+            nn.Linear(embedding_dim*8, embedding_dim*4),
             nn.ReLU(),
             nn.Dropout(p=dropout_prob),
-            nn.Linear(embedding_dim, num_labels)
+            nn.Linear(embedding_dim*4, num_labels)
         )
 
         self.init_weights()
