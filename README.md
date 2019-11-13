@@ -14,7 +14,7 @@ question level classification pre-trained model download link : <br>
 >[Google drive link](https://drive.google.com/drive/folders/1AsK-xYOwN8x_rw05AyA3ZiIISGj4N2I2?usp=sharing)
 
 3. ``Level_Classification/LevelClassificationModel.py``를 import하고 해당 모듈에 선언된 함수를 사용하시면 되겠습니다.
-> 현재 LevelClassificationModel.py에는 미리 예시로 2개의 문장(question, description)이 들어가 있습니다. 
+> 현재 LevelClassificationModel.py에는 미리 예시로 3개의 문장(question, clip description, scene description)이 들어가 있습니다. 
 
 4. ``output``으로 다음 두가지가 출력됩니다.
 > Memory Level : 1 <br>
