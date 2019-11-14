@@ -1,10 +1,8 @@
-export BERT_BASE_DIR=uncased_L-12_H-768_A-12
-
-python  pickle_BERT.py \
+python  run_classifier.py \
 	--data_dir SNUdataset \
 	--task_name logic \
-	--vocab_file $BERT_BASE_DIR/vocab.txt \
-	--output_dir result/[logic]residual_emb200_batch16_single_align_epoch60 \
+	--vocab_file vocab.txt \
+	--output_dir result \
 	--train_batch_size 8 \
 	--eval_batch_size 8 \
 	--do_lower_case \
