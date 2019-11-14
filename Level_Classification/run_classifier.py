@@ -1,19 +1,3 @@
-# coding=utf-8
-# Copyright 2018 The Google AI Language Team Authors and The HugginFace Inc. team.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-"""BERT finetuning runner."""
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -39,7 +23,7 @@ from apex.fp16_utils import FP16_Optimizer
 
 
 import tokenization
-from modeling import SequenceClassification
+from pickle_model import SequenceClassification
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -473,7 +457,7 @@ def main():
     model = SequenceClassification(vocab_dim, args.embedding_dim, args.dropout_prob, len(label_list), device)
 
     if args.load_model is not None:
-        model.load_state_dict(torch.load(args.load_model,map_location='cpu'))
+        model.load_state_dict(torch.load(args.load_model, map_location='cpu'))
 
     model.to(device)
 
@@ -484,11 +468,7 @@ def main():
     if args.local_rank != -1:
         model = DDP(model)
         optimizer = FP16_Optimizer(optimizer)
-        '''
-        model = torch.nn.parallel.DistributedDataParallel(model,
-                                                          device_ids=[args.local_rank],
-                                                          output_device=args.local_rank)
-        '''
+        
     elif n_gpu > 1:
         model = torch.nn.DataParallel(model)
 
@@ -561,15 +541,15 @@ def main():
                 optimizer.step()
 
                 global_step += 1
-
-                if global_step%args.save_checkpoints_steps == 0:
-                    if args.task_name == 'memory':
-                        torch.save(model.state_dict(),
-                               os.path.join(args.model_path, 'memory_model' + str(global_step) + '.bin'))
-                    else:
-                        torch.save(model.state_dict(),
-                                   os.path.join(args.model_path,'logic_model'+str(global_step)+'.bin'))
+            if (epoch+1)%10 == 0:
+                if args.task_name == 'memory':
+                    torch.save(model.state_dict(),
+                               os.path.join(args.model_path, 'non_crossPassage_res_memory_model' + str(epoch+1) + '.bin'))
+                else:
+                    torch.save(model.state_dict(),
+                                   os.path.join(args.model_path,'non_crossPassage_res_logic_model'+str(epoch+1)+'.bin'))
             losses.append(tr_loss / nb_tr_steps)
+
             #develop dataset evaluation
             dev_accuracy, nb_dev_examples = 0, 0
             for q_ids, d_ids, sd_ids, label_ids in dev_dataloader:
@@ -597,15 +577,6 @@ def main():
             print("validataion Loss : {}".format(dev_loss.item()))
             dev_losses.append(dev_loss.item())
             print('-' * 20)
-
-    fig = plt.figure()
-    ax = fig.add_subplot(1,1,1)
-    train_loss, = ax.plot([i for i in range(len(losses))], losses, label='train_loss')
-    dev_loss, = ax.plot([i for i in range(len(dev_losses))], dev_losses, label='dev_loss')
-    ax.legend()
-    fig.savefig('[' + str(args.task_name) + '] loss.png')
-    plt.close(fig)
-
 
     if args.do_eval:
         eval_examples = processor.get_test_examples(args.data_dir)
@@ -665,8 +636,8 @@ def main():
 
         result = {'eval_loss': eval_loss,
                   'eval_accuracy': eval_accuracy,
-                  'global_step': global_step,
-                  'loss': tr_loss / nb_tr_steps}  # 'loss': loss.item()}
+                  'global_step': global_step}
+                  #'loss': tr_loss / nb_tr_steps}  # 'loss': loss.item()}
 
         output_eval_file = os.path.join(args.output_dir, "eval_results.txt")
         with open('[memory]align_epoch20_output', 'w') as f:
