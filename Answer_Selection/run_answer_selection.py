@@ -243,25 +243,33 @@ def evaluate(args, model, tokenizer, prefix=""):
 
         eval_loss = eval_loss / nb_eval_steps
         if args.output_mode == "classification":
+            confidence = preds
             preds = np.argmax(preds, axis=1)
         elif args.output_mode == "regression":
             preds = np.squeeze(preds)
 
-        result = compute_metrics(eval_task, preds, out_label_ids)
-        results.update(result)
+        if args.question_text == "":
+            result = compute_metrics(eval_task, preds, out_label_ids)
+            results.update(result)
 
-        output_eval_file = os.path.join(eval_output_dir, "eval_results.txt")
-        with open(output_eval_file, "w") as writer:
-            logger.info("***** Eval results {} *****".format(prefix))
-            for key in sorted(result.keys()):
-                logger.info("  %s = %s", key, str(result[key]))
-                writer.write("%s = %s\n" % (key, str(result[key])))
+            output_eval_file = os.path.join(eval_output_dir, "eval_results.txt")
+            with open(output_eval_file, "w") as writer:
+                logger.info("***** Eval results {} *****".format(prefix))
+                for key in sorted(result.keys()):
+                    logger.info("  %s = %s", key, str(result[key]))
+                    writer.write("%s = %s\n" % (key, str(result[key])))
 
-        processor = processors[args.task_name.lower()]()
-        examples = processor.get_dev_examples(args.data_dir)
+            processor = processors[args.task_name.lower()](args.num_labels)
+            examples = processor.get_dev_examples(args.data_dir)
 
-        write_predictions(examples, len(processor.get_labels()), tokenizer, preds, out_label_ids, args)
-
+            write_predictions(examples, len(processor.get_labels()), tokenizer, preds, out_label_ids, args)
+        else:
+            result = {"AC": confidence[0]}
+            results.update(result)
+            logger.info("Answer Confidence : {}".format(str(results["AC"])))
+            result = {"SA" : args.answer_candidates_list[preds[0]]}
+            results.update(result)
+            logger.info("Selected Answer : {}".format(str(results["SA"])))
     return results
 
 
@@ -285,8 +293,17 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
         label_list = processor.get_labels()
         if task in ['mnli', 'mnli-mm'] and args.model_type in ['roberta']:
             # HACK(label indices are swapped in RoBERTa pretrained model)
-            label_list[1], label_list[2] = label_list[2], label_list[1] 
-        examples = processor.get_dev_examples(args.data_dir) if evaluate else processor.get_train_examples(args.data_dir)
+            label_list[1], label_list[2] = label_list[2], label_list[1]
+        if evaluate: 
+            if args.question_text != "":
+                examples = processor.get_dev_example(args.question_text, args.clip_description_text, args.description_text, args.answer_candidates_list) 
+            else:
+                examples = processor.get_dev_examples(args.data_dir) 
+        
+        else:
+            examples = processor.get_train_examples(args.data_dir)
+        
+        
         features = convert_examples_to_features(examples, label_list, args.max_seq_length, tokenizer, output_mode,
             cls_token_at_end=bool(args.model_type in ['xlnet']),            # xlnet has a cls token at the end
             cls_token=tokenizer.cls_token,
@@ -400,6 +417,18 @@ def main():
                         help="For distributed training: local_rank")
     parser.add_argument('--server_ip', type=str, default='', help="For distant debugging.")
     parser.add_argument('--server_port', type=str, default='', help="For distant debugging.")
+    
+    
+    parser.add_argument('--question_text', type=str, default="",
+                        help="Question about clip video")
+    parser.add_argument('--clip_description_text', type=str, default="",
+                        help="description about clip")
+    parser.add_argument('--description_text', type=str, default="",
+                        help="description about scene")
+    parser.add_argument('--answer_candidates_list', type=str, action='append',
+            help="candidates of answer")
+
+    
     args = parser.parse_args()
 
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir) and args.do_train and not args.overwrite_output_dir:

@@ -62,6 +62,9 @@ class DataProcessor(object):
         """Gets a collection of `InputExample`s for the dev set."""
         raise NotImplementedError()
 
+    def get_dev_example(self, question_text, clip_description_text, description_text, answer_candidates_list):
+        raise NotImplementedError()
+
     def get_labels(self):
         """Gets the list of labels for this data set."""
         raise NotImplementedError()
@@ -138,6 +141,19 @@ class AsProcessor(DataProcessor):
 
             self.num_labels = len(label)
 
+        return examples
+
+    def get_dev_example(self, question_text, clip_description_text, description_text, answer_candidates_list):
+        examples = []
+        text_q = question_text
+        text_d = clip_description_text
+        text_sd = description_text
+        text_as = answer_candidates_list
+        label = '0'
+            
+        self.num_labels = len(label)
+
+        examples.append(InputExample(0, text_q, text_d, text_sd, text_as, label))
         return examples
 
     def get_labels(self):
