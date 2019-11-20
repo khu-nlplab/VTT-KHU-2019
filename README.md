@@ -30,10 +30,13 @@ __How to Use__
 Answer selection classification pre-trained model and data download link: <br>
 >[Google drive link](https://drive.google.com/open?id=1U2OV0ZFi-BtjJC-78DeZ0UgPpic0tzKG)
 
-2. ``Answer_Selection/run_answer_selection.sh``를 실행하면 output이 출력됩니다.(예시포함)
+2. ``Answer_Selection/transformers``에 들어가서 다음 명령어 실행.
+>pip install .
+
+3. ``Answer_Selection/run_answer_selection.sh``를 실행하면 output이 출력됩니다.(예시포함)
 >./run_answer_selection.sh
 
-3. ``output``으로 다음 두가지가 출력됩니다.
+4. ``output``으로 다음 두가지가 출력됩니다.
 >Answer Confidence : [x.xxxx  x.xxxx] <br>
 >Selected Answer : blah blah ~.
 
