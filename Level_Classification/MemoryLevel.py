@@ -2,25 +2,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import csv
-import os
-import logging
-import argparse
-import random
-from tqdm import tqdm, trange
-
 import numpy as np
 import torch
-from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
-from torch.utils.data.distributed import DistributedSampler
 
-import torch.distributed as dist
-from matplotlib import pyplot as plt
-
-from apex import amp
-from apex.parallel import DistributedDataParallel as DDP
-from apex.fp16_utils import FP16_Optimizer
-from modeling import SequenceClassification
+from multi_passage_model import SequenceClassification
 
 import tokenization
 
@@ -50,7 +35,7 @@ class InputExample(object):
 class InputFeatures(object):
     """A single set of features of data."""
 
-    def __init__(self, que_ids, des_ids, scene_ids, label_id):
+    def __init__(self, que_ids, des_ids, scene_ids, label_id=None):
         self.que_ids = que_ids
         self.des_ids = des_ids
         self.scene_ids = scene_ids
@@ -91,6 +76,7 @@ def convert_to_ids(examples, label_list, max_seq_length, tokenizer):
         label_map[label] = i
 
     features = []
+    label_id = None
     for (ex_index, example) in enumerate(examples):
 
         # question features
@@ -135,8 +121,10 @@ def convert_to_ids(examples, label_list, max_seq_length, tokenizer):
             scene_ids.append(0)
 
         assert len(scene_ids) == max_seq_length
-
-        label_id = label_map[example.label]
+        if example.label == None:
+            label_id == None
+        else:
+            label_id = label_map[example.label]
 
         features.append(
             InputFeatures(
@@ -147,35 +135,36 @@ def convert_to_ids(examples, label_list, max_seq_length, tokenizer):
 
     return features
 
-
-def Memory_level_model(qestion, clip_description, scene_description):
-    # environment
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    max_sequence_length = 128
+def Memory_level_model_init(init_checkpoint):
     vocab_file = 'vocab.txt'
-    embedding_dim = 200
-    dropout_prob = 0.2
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    vocab_dim = len(tokenization.load_vocab(vocab_file))
-
+    embedding_dim = 128
+    dropout_prob = 0.1
     processor = MemoryProcessor()
     label_list = processor.get_labels()
-    tokenizer = tokenization.FullTokenizer(vocab_file=vocab_file, do_lower_case=False)
-
-    label_list = processor.get_labels()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    vocab_dim = len(tokenization.load_vocab(vocab_file))
 
     model = SequenceClassification(vocab_dim, embedding_dim, dropout_prob, len(label_list), device)
-
-    init_checkpoint = 'model/Memory_model.bin'
-
-    # Future save model Load code
 
     if init_checkpoint is not None:
         model.load_state_dict(torch.load(init_checkpoint, map_location='cpu'))
 
+    return model
+
+def Memory_level_model(qestion, clip_description, scene_description, Memory_model):
+    #inference environment
+    max_sequence_length = 128
+    vocab_file = 'vocab.txt'
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    processor = MemoryProcessor()
+    label_list = processor.get_labels()
+    tokenizer = tokenization.FullTokenizer(vocab_file=vocab_file, do_lower_case=False)
+
+    # Future save model Load code
+    model = Memory_model
     model.to(device)
 
+    #data preprocess
     eval_example = processor._create_examples(qestion, clip_description, scene_description)
     eval_feature = convert_to_ids(eval_example, label_list, max_sequence_length, tokenizer)
 
@@ -183,28 +172,12 @@ def Memory_level_model(qestion, clip_description, scene_description):
     des_ids = torch.tensor([f.des_ids for f in eval_feature], dtype=torch.long)
     scene_ids = torch.tensor([f.scene_ids for f in eval_feature], dtype=torch.long)
 
-    if eval_feature.label_id == None:
-        label_ids = None
-    else:
-        label_ids = torch.tensor([f.label_ids for f in eval_feature], dtype=torch.long)
-
-    # eval_data = TensorDataset(input_ids, input_mask, segment_ids, label_ids)
-
-    # eval_dataloader = DataLoader(eval_data)
-
     model.eval()
 
     que_ids = que_ids.to(device)
     des_ids = des_ids.to(device)
     scene_ids = scene_ids.to(device)
-    if label_ids == None:
-        pass
-    else:
-        label_ids = label_ids.to(device)
-    if label_ids == None:
-        logits = model(que_ids, des_ids, scene_ids, label_ids)
-    else:
-        loss, logits = model(que_ids, des_ids, scene_ids, label_ids)
+    logits = model(que_ids, des_ids, scene_ids)
 
     logits = logits.detach().cpu().numpy()
 

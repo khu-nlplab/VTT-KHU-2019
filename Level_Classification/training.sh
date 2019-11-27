@@ -1,16 +1,16 @@
-python  run_classifier.py \
+python  multi_passage_run.py \
 	--data_dir SNUdataset \
-	--task_name logic \
+	--task_name memory \
 	--vocab_file vocab.txt \
-	--output_dir result \
-	--train_batch_size 8 \
+	--output_dir result/[yourtask]result \
+	--train_batch_size 16 \
 	--eval_batch_size 8 \
 	--do_lower_case \
 	--max_seq_length 128 \
 	--do_train \
 	--do_eval \
-	--learning_rate 1e-5 \
-	--num_train_epochs 60.0 \
-	--embedding_dim 200 \
+	--learning_rate 2e-5 \
+	--num_train_epochs 100.0 \
+	--embedding_dim 128 \
 	--local_rank -1 \
-	#--load_model ./model/memory_model_15000.bin \
+	--dropout_prob 0.1 \
