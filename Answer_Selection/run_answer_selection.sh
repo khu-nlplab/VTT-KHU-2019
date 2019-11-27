@@ -16,6 +16,8 @@ python ./run_answer_selection.py \
     --save_steps 1000 \
     --num_labels 2 \
     --output_dir $VTT_DIR/output_dir \
+    --initialize_model False \
+    --inference_model True \
     --question_text "Who walks into the apartment?" \
     --clip_description_text "Chandler is sitting in a chair when Rachel walks into the apartment carrying two boxes." \
     --description_text "Chandler is sitting in a chair while Monica is sitting at the apartment." \
